@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "ebbf3ca9-5d32-4325-943c-ede01b9a53bb"
+      }
+    },
+    "android": {
+      "package": "com.philippemerariu.allcards"
+    }
+  }
+}
