@@ -1,6 +1,7 @@
 import { Platform, StyleSheet, View, Text, Pressable, TextInput, ToastAndroid} from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
+import * as EmailValidator from 'email-validator';
 
 export default function RegisterScreen({}) {
   const [email, setEmail] = useState("")
@@ -8,6 +9,10 @@ export default function RegisterScreen({}) {
   const [confirmPassword, setConfirmPassword] = useState("")
 
   const handleSignup = async () => {
+    if (!EmailValidator.validate(email)){
+        alert("Please enter a valid email address");
+        return;
+    }
     if (password != confirmPassword){
         alert("Please make sure the Password and Confirmation are the same");
         return;
@@ -35,12 +40,13 @@ export default function RegisterScreen({}) {
     }
   };
 
-  const passwordBorderColor = (password == confirmPassword) ? { borderColor: 'black' } : { borderColor: 'red' }
+  const emailBoderColor = (email.length < 3 || EmailValidator.validate(email)) ? { borderColor: 'black' } : { borderColor: 'red' };
+  const passwordBorderColor = (password.length < 3 || confirmPassword.length < 3 || password == confirmPassword) ? { borderColor: 'black' } : { borderColor: 'red' };
 
   return (
     <View style={styles.page}>
       <TextInput 
-        style={styles.inputboxes}
+        style={[styles.inputboxes, emailBoderColor]}
         placeholder="Email"
         placeholderTextColor={'gray'}
         onChangeText={u => setEmail(u)}/>
