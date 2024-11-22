@@ -1,7 +1,6 @@
-import { Platform, StyleSheet, View, Text, Pressable, Button, TextInput, ToastAndroid, Modal } from 'react-native';
+import { Platform, StyleSheet, View, Text, Pressable, Button, TextInput, ToastAndroid } from 'react-native';
 import { Link, router, Stack } from 'expo-router';
 import { useState } from 'react';
-import { dismiss } from 'expo-router/build/global-state/routing';
 
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
@@ -17,8 +16,6 @@ import { dismiss } from 'expo-router/build/global-state/routing';
 // };
 
 export default function LoginScreen({}) {
-  const [error, setError] = useState('');
-	const [loading, setLoading] = useState(false);
   const [count, setCount] = useState(0);
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -40,9 +37,9 @@ export default function LoginScreen({}) {
     }else{
       console.log("ERROR:", resjson.error);
       if (Platform.OS == "android"){
-        ToastAndroid.show(`ERROR: ${error}`, ToastAndroid.SHORT);
+        ToastAndroid.show(`ERROR: ${resjson.error}`, ToastAndroid.SHORT);
       }else if (Platform.OS == "web"){
-
+        alert(`ERROR: ${resjson.error}`);
       }
     }
   };

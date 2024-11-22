@@ -1,21 +1,16 @@
-import { Platform, StyleSheet, View, Text, Pressable, Button, TextInput, ToastAndroid, Modal } from 'react-native';
-import { Link, router, Stack } from 'expo-router';
+import { Platform, StyleSheet, View, Text, Pressable, TextInput, ToastAndroid} from 'react-native';
+import { router } from 'expo-router';
 import { useState } from 'react';
-import { dismiss } from 'expo-router/build/global-state/routing';
 
 export default function RegisterScreen({}) {
-  const [error, setError] = useState('');
-	const [loading, setLoading] = useState(false);
-  const [count, setCount] = useState(0);
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [validPassword, setValidPassword] = useState(true);
+  const [confirmPassword, setConfirmPassword] = useState("")
 
   const handleSignup = async () => {
-    if (validPassword){
-        alert("ALL GOOD");
-    }else{
-        alert("passwords do not match!");
+    if (password != confirmPassword){
+        alert("Please make sure the Password and Confirmation are the same");
+        return;
     }
     const SERVER_URL = "http://192.168.68.76:5000/signup"
     const res = await fetch(SERVER_URL, {
@@ -24,31 +19,23 @@ export default function RegisterScreen({}) {
         "Accept": "application/json",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({email: email, password: password})
+      body: JSON.stringify({email: email, password: password, confirmPassword: confirmPassword})
     });
     const resjson = await res.json();
     if (res.ok){
-      console.log("LOGIN SUCCESSFUL --> welcome", resjson.email);
-      router.push("/home");
+      console.log("Successfully created account for", resjson.email);
+      router.replace("/home");
     }else{
       console.log("ERROR:", resjson.error);
       if (Platform.OS == "android"){
-        ToastAndroid.show(`ERROR: ${error}`, ToastAndroid.SHORT);
+        ToastAndroid.show(`ERROR: ${resjson.error}`, ToastAndroid.SHORT);
       }else if (Platform.OS == "web"){
-
+        alert(`ERROR: ${resjson.error}`);
       }
     }
   };
 
-  const isSamePassword = (p: string) => {
-    if (p != password){
-        setValidPassword(false);
-    }else{
-        setValidPassword(true);
-    }
-  }
-
-  const passwordBorderColor = validPassword ? { borderColor: 'black' } : { borderColor: 'red' }
+  const passwordBorderColor = (password == confirmPassword) ? { borderColor: 'black' } : { borderColor: 'red' }
 
   return (
     <View style={styles.page}>
@@ -68,7 +55,7 @@ export default function RegisterScreen({}) {
         placeholder="Confirm Password"
         placeholderTextColor={'gray'}
         secureTextEntry={true}
-        onChangeText={p => isSamePassword(p)}/>
+        onChangeText={p => setConfirmPassword(p)}/>
       <Pressable style={styles.signupButton} onPress={handleSignup}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </Pressable>
