@@ -1,22 +1,35 @@
-import { Platform, StyleSheet, View, Text, Pressable, TextInput, ToastAndroid} from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput} from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import * as EmailValidator from 'email-validator';
+import { displayMessage } from '@/utilities/displayMessage';
 
 export default function RegisterScreen({}) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
-  const handleSignup = async () => {
+  const validateInfo = () => {
+    if (!email || ! password || !confirmPassword){
+        displayMessage("Please enter ALL fields and press 'Sign Up'");
+        return;
+    }
     if (!EmailValidator.validate(email)){
-        alert("Please enter a valid email address");
+        displayMessage("Please enter a valid email address");
+        return;
+    }
+    if (password.length < 6){
+        displayMessage("Password must be at least 6 characters");
         return;
     }
     if (password != confirmPassword){
-        alert("Please make sure the Password and Confirmation are the same");
+        displayMessage("Please make sure the Password and Confirmation are the same");
         return;
     }
+  };
+
+  const handleSignup = async () => {
+    validateInfo();
     const SERVER_URL = "http://192.168.68.76:5000/signup"
     const res = await fetch(SERVER_URL, {
       method: "POST",
@@ -31,12 +44,7 @@ export default function RegisterScreen({}) {
       console.log("Successfully created account for", resjson.email);
       router.replace("/home");
     }else{
-      console.log("ERROR:", resjson.error);
-      if (Platform.OS == "android"){
-        ToastAndroid.show(`ERROR: ${resjson.error}`, ToastAndroid.SHORT);
-      }else if (Platform.OS == "web"){
-        alert(`ERROR: ${resjson.error}`);
-      }
+      displayMessage(`ERROR: ${resjson.error}`);
     }
   };
 
