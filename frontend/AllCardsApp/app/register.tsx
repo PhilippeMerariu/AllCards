@@ -63,12 +63,16 @@ export default function RegisterScreen({}) {
         style={[styles.inputboxes, emailBoderColor]}
         placeholder="Email"
         placeholderTextColor={'gray'}
+        autoCapitalize="none"
+        autoCorrect={false}
         onChangeText={u => setEmail(u)}
         onSubmitEditing={() => {passwordInputRef.current?.focus()}}/>
       <TextInput 
         style={[styles.inputboxes, passwordBorderColor]}
         placeholder="Password"
         placeholderTextColor={'gray'}
+        autoCapitalize="none"
+        autoCorrect={false}
         secureTextEntry={true}
         ref={passwordInputRef}
         onChangeText={p => setPassword(p)}
@@ -77,6 +81,8 @@ export default function RegisterScreen({}) {
         style={[styles.inputboxes, passwordBorderColor]}
         placeholder="Confirm Password"
         placeholderTextColor={'gray'}
+        autoCapitalize="none"
+        autoCorrect={false}
         secureTextEntry={true}
         ref={confirmPassInputRef}
         onChangeText={p => setConfirmPassword(p)}

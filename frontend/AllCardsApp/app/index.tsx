@@ -84,12 +84,16 @@ export default function LoginScreen({}) {
         style={[styles.inputboxes, {marginTop: 50}]}
         placeholder="Email"
         placeholderTextColor={'gray'}
+        autoCapitalize="none"
+        autoCorrect={false}
         onChangeText={u => setEmail(u)}
         onSubmitEditing={() => { passwordInputRef.current?.focus() }}/>
       <TextInput
         style={styles.inputboxes}
         placeholder="Password"
         placeholderTextColor={'gray'}
+        autoCapitalize="none"
+        autoCorrect={false}
         secureTextEntry={true}
         ref={passwordInputRef}
         onChangeText={p => setPassword(p)}

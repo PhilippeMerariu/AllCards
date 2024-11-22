@@ -80,6 +80,7 @@ app.post('/login', (req, res) => {
             return res.status(400).send({error: `User ${email} does NOT exist. Please sign up.`});
         }
         if (bcrypt.compareSync(password, result.password)){
+            console.log(`Logged in as ${email}`);
             return res.status(200).send({email: result.email});
         }
         return res.status(400).send({error: "Incorrect email or password."});
@@ -106,6 +107,7 @@ app.post('/signup', (req, res) => {
         }
         createUser(email, encryptedPass).then(success => {
             if (success){
+                console.log(`Successully created user ${email}`);
                 return res.status(200).send({email: email});
             }
             return res.status(400).send({error: "An error occured while creating the user"});
