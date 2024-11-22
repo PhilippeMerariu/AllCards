@@ -48,7 +48,7 @@ export default function RegisterScreen({}) {
     const resjson = await res.json();
     if (res.ok){
       console.log("Successfully created account for", resjson.email);
-      router.replace("/home");
+      router.replace("/cards");
     }else{
       displayMessage(`ERROR: ${resjson.error}`);
     }

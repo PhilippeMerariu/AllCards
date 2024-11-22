@@ -52,7 +52,7 @@ export default function LoginScreen({}) {
     const resjson = await res.json();
     if (res.ok){
       console.log("LOGIN SUCCESSFUL --> welcome", resjson.email);
-      router.push("/home");
+      router.push("/cards");
     }else{
       console.log("ERROR:", resjson.error);
       if (Platform.OS == "android"){
@@ -98,19 +98,17 @@ export default function LoginScreen({}) {
         ref={passwordInputRef}
         onChangeText={p => setPassword(p)}
         onSubmitEditing={handleEmailLogin}/>
-      {/* <Link href="/home" asChild> */}
       <Pressable style={styles.loginButton} onPress={handleEmailLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable>
       <View style={styles.separator}/>
       <Text style={styles.signupText}>Don't have an accout? <Link href="/register" style={styles.signupLink}>Sign up now.</Link></Text>
-      {/* </Link> */}
-      {/* <Link href="/home" asChild>
-        <Pressable style={styles.loginButton} onPress={handleGoogleLogin}>
-          <Text style={styles.buttonText}>Continue with Google</Text>
-        </Pressable>
-      </Link> */}
       <Text style={{margin: 20}}>Count: {count}</Text>
+      <Link href="/cards" asChild>
+        <Pressable style={styles.loginButton}>
+          <Text style={styles.buttonText}>TEST</Text>
+        </Pressable>
+      </Link>
     </View>
   );
 }

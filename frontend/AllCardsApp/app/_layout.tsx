@@ -1,4 +1,3 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,6 +7,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { View } from 'react-native-reanimated/lib/typescript/Animated';
+import { Colors } from '@/constants/Colors';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,7 +32,7 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#164591',
+            backgroundColor: Colors.mainTheme,
           },
           headerTintColor: '#ffffff',
           headerTitleStyle: {
