@@ -1,6 +1,6 @@
 import { Platform, StyleSheet, View, Text, Pressable, Button, TextInput, ToastAndroid } from 'react-native';
 import { Link, router, Stack } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
@@ -17,8 +17,10 @@ import { useState } from 'react';
 
 export default function LoginScreen({}) {
   const [count, setCount] = useState(0);
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const passwordInputRef = useRef<TextInput>(null);
 
   const handleEmailLogin = async () => {   
     const SERVER_URL = "http://192.168.68.76:5000/login"
@@ -65,13 +67,16 @@ export default function LoginScreen({}) {
         style={[styles.inputboxes, {marginTop: 50}]}
         placeholder="Email"
         placeholderTextColor={'gray'}
-        onChangeText={u => setEmail(u)}/>
-      <TextInput 
+        onChangeText={u => setEmail(u)}
+        onSubmitEditing={() => { passwordInputRef.current?.focus() }}/>
+      <TextInput
         style={styles.inputboxes}
         placeholder="Password"
         placeholderTextColor={'gray'}
         secureTextEntry={true}
-        onChangeText={p => setPassword(p)}/>
+        ref={passwordInputRef}
+        onChangeText={p => setPassword(p)}
+        onSubmitEditing={handleEmailLogin}/>
       {/* <Link href="/home" asChild> */}
       <Pressable style={styles.loginButton} onPress={handleEmailLogin}>
         <Text style={styles.buttonText}>Login</Text>
