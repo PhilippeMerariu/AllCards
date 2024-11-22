@@ -5,9 +5,9 @@
 node --env-file=.env server.js
 ```
 
-## Run frontend
+## Run Frontend
 ```
-cd frontend/AllCardsApp
-eas build --profile development --platform android
-npx expo start --dev-client
+npx expo start --go
 ```
+
+Open _Expo Go_ app on phone and connect to project.
