@@ -26,20 +26,21 @@ async function connectToDB(){
 }
 
 async function userExists(email){
+    let user = null;
     try{
         const db = await connectToDB();
         const usersColl = db.collection('users');
 
         const query = {email: email};
 
-        const user = await usersColl.findOne(query);
+        user = await usersColl.findOne(query);
         if (user == null){
-            return false;
+            return {exists: false};
         }
     }catch(err){
         console.log(err);
     }
-    return true;
+    return {exists: true, email: user.email, password: user.password};
 }
 
 async function createUser(email, password){
@@ -69,11 +70,20 @@ app.get('/', (req, res) => {
 app.post('/login', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    res.setHeader('Access-Control-Allow-Origin', '*');
     if (!email || !password){
         return res.status(400).send({error: "Please enter an Email and a Password to login."});
     }
-    return res.status(200).send({email: email});
+
+    // Authenticate User
+    userExists(email).then(result => {
+        if (!result.exists){
+            return res.status(400).send({error: `User ${email} does NOT exist. Please sign up.`});
+        }
+        if (bcrypt.compareSync(password, result.password)){
+            return res.status(200).send({email: result.email});
+        }
+        return res.status(400).send({error: "Incorrect email or password."});
+    });
 });
 
 app.post('/signup', (req, res) => {
@@ -90,9 +100,9 @@ app.post('/signup', (req, res) => {
 
     encryptedPass = bcrypt.hashSync(password, 10);
 
-    userExists(email).then(yes => {
-        if (yes){
-            return res.status(400).send({error: `User with email ${email} already exists.`}); 
+    userExists(email).then(result => {
+        if (result.exists){
+            return res.status(400).send({error: `User with email ${result.email} already exists.`}); 
         }
         createUser(email, encryptedPass).then(success => {
             if (success){
