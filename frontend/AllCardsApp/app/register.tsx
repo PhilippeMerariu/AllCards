@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, Pressable, TextInput} from 'react-native';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import * as EmailValidator from 'email-validator';
 import { displayMessage } from '@/utilities/displayMessage';
 
@@ -9,27 +9,33 @@ export default function RegisterScreen({}) {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
+  const passwordInputRef = useRef<TextInput>(null);
+  const confirmPassInputRef = useRef<TextInput>(null);
+
   const validateInfo = () => {
     if (!email || ! password || !confirmPassword){
         displayMessage("Please enter ALL fields and press 'Sign Up'");
-        return;
+        return false;
     }
     if (!EmailValidator.validate(email)){
         displayMessage("Please enter a valid email address");
-        return;
+        return false;
     }
     if (password.length < 6){
         displayMessage("Password must be at least 6 characters");
-        return;
+        return false;
     }
     if (password != confirmPassword){
         displayMessage("Please make sure the Password and Confirmation are the same");
-        return;
+        return false;
     }
+    return true;
   };
 
   const handleSignup = async () => {
-    validateInfo();
+    if (!validateInfo()){
+        return;
+    }
     const SERVER_URL = "http://192.168.68.76:5000/signup"
     const res = await fetch(SERVER_URL, {
       method: "POST",
@@ -57,19 +63,24 @@ export default function RegisterScreen({}) {
         style={[styles.inputboxes, emailBoderColor]}
         placeholder="Email"
         placeholderTextColor={'gray'}
-        onChangeText={u => setEmail(u)}/>
+        onChangeText={u => setEmail(u)}
+        onSubmitEditing={() => {passwordInputRef.current?.focus()}}/>
       <TextInput 
         style={[styles.inputboxes, passwordBorderColor]}
         placeholder="Password"
         placeholderTextColor={'gray'}
         secureTextEntry={true}
-        onChangeText={p => setPassword(p)}/>
+        ref={passwordInputRef}
+        onChangeText={p => setPassword(p)}
+        onSubmitEditing={() => {confirmPassInputRef.current?.focus()}}/>
       <TextInput 
         style={[styles.inputboxes, passwordBorderColor]}
         placeholder="Confirm Password"
         placeholderTextColor={'gray'}
         secureTextEntry={true}
-        onChangeText={p => setConfirmPassword(p)}/>
+        ref={confirmPassInputRef}
+        onChangeText={p => setConfirmPassword(p)}
+        onSubmitEditing={handleSignup}/>
       <Pressable style={styles.signupButton} onPress={handleSignup}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </Pressable>

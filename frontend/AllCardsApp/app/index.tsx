@@ -1,6 +1,8 @@
 import { Platform, StyleSheet, View, Text, Pressable, Button, TextInput, ToastAndroid } from 'react-native';
 import { Link, router, Stack } from 'expo-router';
 import { useRef, useState } from 'react';
+import { displayMessage } from '@/utilities/displayMessage';
+import * as EmailValidator from 'email-validator';
 
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
@@ -22,7 +24,22 @@ export default function LoginScreen({}) {
 
   const passwordInputRef = useRef<TextInput>(null);
 
-  const handleEmailLogin = async () => {   
+  const validateInfo = () => {
+    if (!email || ! password){
+        displayMessage("Please enter ALL fields and press 'Login'");
+        return false;
+    }
+    if (!EmailValidator.validate(email)){
+        displayMessage("Please enter a valid email address");
+        return false
+    }
+    return true;
+  };
+
+  const handleEmailLogin = async () => { 
+    if (!validateInfo()){
+      return;
+    }  
     const SERVER_URL = "http://192.168.68.76:5000/login"
     const res = await fetch(SERVER_URL, {
       method: "POST",
