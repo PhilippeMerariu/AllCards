@@ -3,13 +3,14 @@ const { MongoClient } = require('mongodb')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const User = require('./shared/models/User');
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
 //############### DATABASE SECTION ###############
-MONGO_URI = process.env.MONGO_URI
+const MONGO_URI = process.env.MONGO_URI
 let mongoClient;
 async function connectToDB(){
     try{
@@ -19,14 +20,14 @@ async function connectToDB(){
             console.log("Successfully connected to MongoDB");
         }
     }catch(err){
-        console.log("Error:", err);
-        return
+        console.log(`[connectToDB] Error: ${err}`);
+        return;
     }
     return mongoClient.db('all_cards');
 }
 
 async function userExists(email){
-    let user = null;
+    let user;
     try{
         const db = await connectToDB();
         const usersColl = db.collection('users');
@@ -38,10 +39,32 @@ async function userExists(email){
             return {exists: false};
         }
     }catch(err){
-        console.log(err);
+        console.log(`[userExists] ERROR: ${err}`);
+        return;
     }
-    return {exists: true, email: user.email, password: user.password};
+    return {exists: true, id: user._id, email: user.email, password: user.password, country: user.country, cards: user.cards};
 }
+
+async function getUserByEmail(email){
+    let user;
+    try{
+        const db = await connectToDB();
+        const usersColl = db.collection('users');
+
+        const query = {email: email};
+
+        let u = await usersColl.findOne(query);
+        if (u == null){
+            return {user: null};
+        }
+        user = new User(u._id, u.email, u.password, u.country, u.cards);
+    }catch(err){
+        console.log(`[getUserByEmail] ERROR: ${err}`);
+        return;
+    }
+    return {user: user.toJSON()};
+}
+
 
 async function createUser(email, password){
     try{
@@ -50,13 +73,14 @@ async function createUser(email, password){
         const user = {
             email: email,
             password: password,
-            country: null
+            country: null,
+            cards: null
         }
         const res = await usersColl.insertOne(user);
         console.log(`Created user ${email} with id: ${res.insertedId}`);
         return true;
     }catch(err){
-        console.log(err);
+        console.log(`[createUser] ERROR: ${err}`);
     }
     return false;
 }
@@ -75,16 +99,27 @@ app.post('/login', (req, res) => {
     }
 
     // Authenticate User
-    userExists(email).then(result => {
-        if (!result.exists){
+    getUserByEmail(email).then(result => {
+        if (result.user == null){
             return res.status(400).send({error: `User ${email} does NOT exist. Please sign up.`});
         }
-        if (bcrypt.compareSync(password, result.password)){
-            console.log(`Logged in as ${email}`);
-            return res.status(200).send({email: result.email});
+        const user = new User(result.user.id, result.user.email, result.user.password, result.user.country, result.user.cards);
+        if (bcrypt.compareSync(password, user.getPassword())){
+            console.log(`Logged in as ${user.getEmail()}`);
+            return res.status(200).send({user: user.toJSON(frontend=true)});
         }
         return res.status(400).send({error: "Incorrect email or password."});
     });
+    // userExists(email).then(result => {
+    //     if (!result?.exists){
+    //         return res.status(400).send({error: `User ${email} does NOT exist. Please sign up.`});
+    //     }
+        // if (bcrypt.compareSync(password, result.password)){
+        //     console.log(`Logged in as ${email}`);
+        //     return res.status(200).send({email: result.email});
+        // }
+    //     return res.status(400).send({error: "Incorrect email or password."});
+    // });
 });
 
 app.post('/signup', (req, res) => {
@@ -99,10 +134,10 @@ app.post('/signup', (req, res) => {
         return res.status(400).send({error: "Password and Password Confirmation do NOT match."});
     }
 
-    encryptedPass = bcrypt.hashSync(password, 10);
+    const encryptedPass = bcrypt.hashSync(password, 10);
 
     userExists(email).then(result => {
-        if (result.exists){
+        if (result?.exists){
             return res.status(400).send({error: `User with email ${result.email} already exists.`}); 
         }
         createUser(email, encryptedPass).then(success => {

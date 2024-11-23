@@ -2,8 +2,8 @@ import { Platform, StyleSheet, View, Text, Pressable, Button, TextInput, ToastAn
 import { Link, router, Stack } from 'expo-router';
 import { useRef, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
+import * as storage from '@/utilities/storage';
 import * as EmailValidator from 'email-validator';
-
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 // GoogleSignin.configure({
@@ -49,9 +49,11 @@ export default function LoginScreen({}) {
       },
       body: JSON.stringify({email: email, password: password})
     });
+
     const resjson = await res.json();
     if (res.ok){
       console.log("LOGIN SUCCESSFUL --> welcome", resjson.email);
+      storage.saveUser(resjson.user);
       router.push("/cards");
     }else{
       console.log("ERROR:", resjson.error);
