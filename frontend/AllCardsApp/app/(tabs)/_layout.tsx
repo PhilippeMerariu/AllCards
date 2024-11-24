@@ -5,15 +5,12 @@ import { Button } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.mainTheme,//Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors.mainTheme,
         headerShown: true,
         headerRight: () => <Button title='+'/>,
         headerStyle:{

@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const User = require('./shared/models/User');
+const Card = require('./shared/models/Card');
 
 const app = express();
 app.use(bodyParser.json());
@@ -73,14 +74,46 @@ async function createUser(email, password){
         const user = {
             email: email,
             password: password,
-            country: null,
-            cards: null
+            country: "",
+            cards: []
         }
         const res = await usersColl.insertOne(user);
         console.log(`Created user ${email} with id: ${res.insertedId}`);
         return true;
     }catch(err){
         console.log(`[createUser] ERROR: ${err}`);
+    }
+    return false;
+}
+
+async function getCardsByEmail(email){
+    try{
+        const db = await connectToDB();
+        const coll = db.collection('users');
+        const query = {email: email};
+
+        const user = await coll.findOne(query);
+        if (user == null){
+            throw Error("Unable to find user");
+        }
+
+        return {cards: user.cards};
+    }catch(err){
+        console.log(`[getCardsByEmail] ERROR: ${err}`);
+    }
+    return {cards: null};
+}
+
+async function createCard(card, user){
+    try{
+        const db = await connectToDB();
+        const coll = db.collection('users');
+        const query = {email: user.email};
+
+        const res = await coll.updateOne(query, {$push: {cards: card.toJSON()}});
+        return true;
+    }catch(err){
+        console.log(`[createCard] ERROR: ${err}`);
     }
     return false;
 }
@@ -148,6 +181,36 @@ app.post('/signup', (req, res) => {
             return res.status(400).send({error: "An error occured while creating the user"});
         })
     });
+});
+
+app.post('/getcards', (req, res) => {
+    const email = req.body.email;
+
+    getCardsByEmail(email).then(result => {
+        if (result.cards == null){
+            return res.status(400).send({error: `Unable to get cards`});
+        }
+        return res.status(200).send({cards: result.cards});
+    });
+});
+
+app.post('/addcard', (req, res) => {
+    const store = req.body.store;
+    const barcode = req.body.barcode;
+    const color = req.body.color;
+    const logo = req.body.logo;
+    const user = req.body.user;
+
+    const card = new Card(store, barcode, color, logo);
+
+    createCard(card, user).then(success => {
+        if (success){
+            console.log(`Successfully created card ${store} for ${user.email}`);
+            return res.status(200).send({card: card.toJSON()});
+        }
+        return res.status(400).send({error: "An error occured while creating the card"});
+    });
+
 });
 //################################################
 

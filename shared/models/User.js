@@ -1,4 +1,4 @@
-module.exports = class User {
+module.exports = class User{
     constructor(id = null, email, password, country = "", cards = []) {
       this.id = id;
       this.email = email;

@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, View, Text, Pressable, Button, TextInput, ToastAndroid } from 'react-native';
+import { StyleSheet, View, Text, Pressable, Button, TextInput } from 'react-native';
 import { Link, router, Stack } from 'expo-router';
 import { useRef, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
@@ -52,16 +52,12 @@ export default function LoginScreen({}) {
 
     const resjson = await res.json();
     if (res.ok){
-      console.log("LOGIN SUCCESSFUL --> welcome", resjson.email);
+      console.log("LOGIN SUCCESSFUL --> welcome", resjson.user.email);
       storage.saveUser(resjson.user);
       router.push("/cards");
     }else{
       console.log("ERROR:", resjson.error);
-      if (Platform.OS == "android"){
-        ToastAndroid.show(`ERROR: ${resjson.error}`, ToastAndroid.SHORT);
-      }else if (Platform.OS == "web"){
-        alert(`ERROR: ${resjson.error}`);
-      }
+      displayMessage(`ERROR: ${resjson.error}`);
     }
   };
   

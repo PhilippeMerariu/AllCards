@@ -1,34 +1,49 @@
-import { Image, StyleSheet, Platform, Pressable, Text, FlatList, View } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet, Pressable, Text, FlatList, View } from 'react-native';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { router } from 'expo-router';
 
 export default function CardsScreen() {
-  const [count, setCount] = useState(0);
-  let cards: any[] = [];
+  const [cards, setCards] = useState(new Array<any>());
 
-  const whoami = () => {
-    const user = storage.getUser();
-    if (user){
-      displayMessage(`Local Storage Data: ${JSON.stringify(user)}`);
-    }
+  const whoami = async (card: any) => {
+    displayMessage(`${card.store}: ${card.barcode}`);
   }
 
-  const getCards = () => {
-    let data: any[] = [];
-    for (let i=0; i < count; i++){
-      data.push({key: i});
+  useEffect(() => {
+    getCards();
+  }, []);
+
+  const getCards = async () => {
+    const user = await storage.getUser();
+
+    const SERVER_URL = "http://192.168.68.76:5000/getcards"
+    const res = await fetch(SERVER_URL, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({email: user.email})
+    });
+    
+    const resjson = await res.json();
+    if (res.ok){
+      setCards(resjson.cards);
     }
-    return data;
+    else{
+      displayMessage(`ERROR: ${resjson.error}`);
+      setCards([]);
+    }
   }
 
   const addCard = () => {
-    setCount(c => c + 1);
+    router.push("/cardForm");
+  }
+
+  const cardColor = (card: any) => {
+    return card.color;
   }
 
   return (
@@ -37,58 +52,14 @@ export default function CardsScreen() {
         <Text>ADD CARD</Text>
       </Pressable>
       <FlatList
-        data={getCards()} 
+        data={cards} 
         renderItem={({item}) =>
-          <Pressable style={styles.cardTiles} onPress={whoami}>
-            <Text>{item.key}</Text>
+          <Pressable style={[styles.cardTiles, {backgroundColor: cardColor(item)}]} onPress={() => {whoami(item)}}>
+            <Text>{item.store}</Text>
           </Pressable>
         }
         numColumns={2}/>
     </View>
-    // <ParallaxScrollView
-    //   headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-    //   headerImage={
-    //     <Image
-    //       source={require('@/assets/images/partial-react-logo.png')}
-    //       style={styles.reactLogo}
-    //     />
-    //   }>
-    //   <ThemedView style={styles.titleContainer}>
-    //     <ThemedText type="title">Oi!</ThemedText>
-    //     <HelloWave />
-    //   </ThemedView>
-    //   <ThemedView style={styles.stepContainer}>
-    //     <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-    //     <ThemedText>
-    //       Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-    //       Press{' '}
-    //       <ThemedText type="defaultSemiBold">
-    //         {Platform.select({
-    //           ios: 'cmd + d',
-    //           android: 'cmd + m',
-    //           web: 'F12'
-    //         })}
-    //       </ThemedText>{' '}
-    //       to open developer tools.
-    //     </ThemedText>
-    //   </ThemedView>
-    //   <ThemedView style={styles.stepContainer}>
-    //     <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-    //     <ThemedText>
-    //       Tap the Explore tab to learn more about what's included in this starter app.
-    //     </ThemedText>
-    //   </ThemedView>
-    //   <ThemedView style={styles.stepContainer}>
-    //     <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-    //     <ThemedText>
-    //       When you're ready, run{' '}
-    //       <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-    //       <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-    //       <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-    //       <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-    //     </ThemedText>
-    //   </ThemedView>
-    // </ParallaxScrollView>
   );
 }
 
