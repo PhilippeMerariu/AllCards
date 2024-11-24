@@ -26,7 +26,7 @@ export async function getUser(){
     }
 }
 
-export async function clearUser(user: any){
+export async function clearUser(){
     try{
         await AsyncStorage.clear();
     }catch(err){
