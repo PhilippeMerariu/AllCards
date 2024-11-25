@@ -5,7 +5,7 @@ import { images } from '@/utilities/imageImporter';
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 
-const pngImages = require.context("./../../assets/images", true, /\.png$/);
+// const pngImages = require.context("./../../assets/images", true, /\.png$/);
 
 export default function CardsScreen() {
   const [cards, setCards] = useState(new Array<any>());
@@ -43,16 +43,16 @@ export default function CardsScreen() {
 
   // not working on mobile
   // currently not being used
-  const getCardImage = (card: any) => {
-    let imgSources = new Map<string, any>();
-    pngImages.keys().forEach((k) => {
-      imgSources.set(k, pngImages(k));
-    });
-    return imgSources.get(`./${card.logo}`).uri;
-  }
+  // const getCardImage = (card: any) => {
+  //   let imgSources = new Map<string, any>();
+  //   pngImages.keys().forEach((k) => {
+  //     imgSources.set(k, pngImages(k));
+  //   });
+  //   return imgSources.get(`./${card.logo}`).uri;
+  // }
 
   const addCard = () => {
-    router.push("/cardForm");
+    router.push("/cardList");
   }
 
   const cardColor = (card: any) => {
