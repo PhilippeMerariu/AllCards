@@ -1,8 +1,11 @@
-import { StyleSheet, Pressable, Text, FlatList, View } from 'react-native';
+import { StyleSheet, Pressable, Text, FlatList, View, Image } from 'react-native';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
+import { images } from '@/utilities/imageImporter';
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
+
+const pngImages = require.context("./../../assets/images", true, /\.png$/);
 
 export default function CardsScreen() {
   const [cards, setCards] = useState(new Array<any>());
@@ -38,6 +41,16 @@ export default function CardsScreen() {
     }
   }
 
+  // not working on mobile
+  // currently not being used
+  const getCardImage = (card: any) => {
+    let imgSources = new Map<string, any>();
+    pngImages.keys().forEach((k) => {
+      imgSources.set(k, pngImages(k));
+    });
+    return imgSources.get(`./${card.logo}`).uri;
+  }
+
   const addCard = () => {
     router.push("/cardForm");
   }
@@ -55,7 +68,11 @@ export default function CardsScreen() {
         data={cards} 
         renderItem={({item}) =>
           <Pressable style={[styles.cardTiles, {backgroundColor: cardColor(item)}]} onPress={() => {whoami(item)}}>
-            <Text>{item.store}</Text>
+            <Image 
+              // source={{uri:getCardImage(item)}}
+              source={images.get(item.store)}
+              style={styles.cardLogo}
+            />
           </Pressable>
         }
         numColumns={2}/>
@@ -73,15 +90,15 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  cardLogo: {
+    width: "60%",
+    height: "60%",
+    resizeMode: "contain",
+    alignSelf: "center",
+    marginVertical: "auto"
   },
   page: {
-    flex: 1,
+    flex: 1
   },
   cardTiles:{
     width: "42%",
