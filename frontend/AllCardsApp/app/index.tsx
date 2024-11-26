@@ -3,6 +3,7 @@ import { Link, router, Stack } from 'expo-router';
 import { useRef, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
+import * as constants from '@/utilities/constants';
 import * as EmailValidator from 'email-validator';
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
@@ -40,8 +41,7 @@ export default function LoginScreen({}) {
     if (!validateInfo()){
       return;
     }  
-    const SERVER_URL = "http://192.168.68.76:5000/login"
-    const res = await fetch(SERVER_URL, {
+    const res = await fetch(`${constants.SERVER_URL}/login`, {
       method: "POST",
       headers: {
         "Accept": "application/json",

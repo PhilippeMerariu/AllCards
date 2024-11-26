@@ -2,6 +2,7 @@ import { StyleSheet, View, Text, Pressable, TextInput} from 'react-native';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
 import * as EmailValidator from 'email-validator';
+import * as constants from '@/utilities/constants';
 import { displayMessage } from '@/utilities/displayMessage';
 
 export default function RegisterScreen({}) {
@@ -36,8 +37,7 @@ export default function RegisterScreen({}) {
     if (!validateInfo()){
         return;
     }
-    const SERVER_URL = "http://192.168.68.76:5000/signup"
-    const res = await fetch(SERVER_URL, {
+    const res = await fetch(`${constants.SERVER_URL}/signup`, {
       method: "POST",
       headers: {
         "Accept": "application/json",

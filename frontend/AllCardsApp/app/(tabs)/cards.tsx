@@ -1,6 +1,7 @@
 import { StyleSheet, Pressable, Text, FlatList, View, Image } from 'react-native';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
+import * as constants from '@/utilities/constants';
 import { images } from '@/utilities/imageImporter';
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
@@ -21,8 +22,7 @@ export default function CardsScreen() {
   const getCards = async () => {
     const user = await storage.getUser();
 
-    const SERVER_URL = "http://192.168.68.76:5000/getcards"
-    const res = await fetch(SERVER_URL, {
+    const res = await fetch(`${constants.SERVER_URL}/getcards`, {
       method: "POST",
       headers: {
         "Accept": "application/json",

@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useRef, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
+import * as constants from '@/utilities/constants';
 
 export default function CardFormScreen({}) {
   const [store, setStore] = useState("")
@@ -15,8 +16,7 @@ export default function CardFormScreen({}) {
   const logoInputRef = useRef<TextInput>(null);
 
   const handleAddCard = async () => {
-    const SERVER_URL = "http://192.168.68.76:5000/addcard"
-    const res = await fetch(SERVER_URL, {
+    const res = await fetch(`${constants.SERVER_URL}/addcard`, {
       method: "POST",
       headers: {
         "Accept": "application/json",

@@ -45,13 +45,15 @@ export default function CardsScreen() {
       <FlatList
         data={cards} 
         renderItem={({item}) =>
-          <TouchableHighlight onPress={() => {whoami(item)}}>
-            <View>
+          <TouchableHighlight style={styles.cardSection} underlayColor={'gray'} onPress={() => {whoami(item)}}>
+            <View style={styles.separator}>
               <Image 
                 source={images.get(item.key)}
                 style={styles.cardLogo}
-                />
-              <Text>{item.key}</Text>
+              />
+              <Text style={styles.cardName}>
+                {item.key}
+              </Text>
             </View>
           </TouchableHighlight>
         }
@@ -61,33 +63,28 @@ export default function CardsScreen() {
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  cardLogo: {
-    width: "60%",
-    height: "60%",
-    resizeMode: "contain",
-    alignSelf: "center",
-    marginVertical: "auto"
-  },
   page: {
     flex: 1
   },
-  cardTiles:{
-    width: "42%",
-    height: 100,
-    backgroundColor: 'lightgray',
-    marginTop: 20,
-    borderRadius: 20,
-    marginLeft: 10,
-    marginRight: "auto",
-    position: "static"
+  separator: {
+    flex: 1,
+    flexDirection: "row",
+    borderBottomWidth: 1.5,
+  },
+  cardLogo: {
+    width: "30%",
+    height: "60%",
+    resizeMode: "contain",
+    alignSelf: "center",
+    marginRight: 10
+  },
+  cardName: {
+    fontSize: 20,
+    width: "70%",
+    alignSelf: "center"
+  },
+  cardSection:{
+    width: "100%",
+    height: 80,
   }
 });
