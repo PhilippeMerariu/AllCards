@@ -2,9 +2,11 @@ import { StyleSheet, Pressable, Text, FlatList, View, Image, TouchableHighlight 
 import { images } from '@/utilities/imageImporter';
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 
 export default function CardsScreen() {
   const [cards, setCards] = useState(new Array<any>());
+  const navigation = useNavigation();
 
   const whoami = async (card: any) => {
   }
@@ -19,6 +21,10 @@ export default function CardsScreen() {
       allCards.push({key: k, imgSource: v});
     });
     setCards(allCards);
+  }
+
+  const handleSelectedCard = (card) => {
+    navigation.navigate("cardForm", {card: card.key});
   }
 
   const handleCustomCard = () => {
@@ -45,7 +51,7 @@ export default function CardsScreen() {
       <FlatList
         data={cards} 
         renderItem={({item}) =>
-          <TouchableHighlight style={styles.cardSection} underlayColor={'gray'} onPress={() => {whoami(item)}}>
+          <TouchableHighlight style={styles.cardSection} underlayColor={'gray'} onPress={() => {handleSelectedCard(item)}}>
             <View style={styles.separator}>
               <Image 
                 source={images.get(item.key)}

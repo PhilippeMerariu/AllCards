@@ -104,13 +104,53 @@ async function getCardsByEmail(email){
     return {cards: null};
 }
 
+async function getUserCard(cardName, email){
+    try{
+        const db = await connectToDB();
+        const coll = db.collection('users');
+        const query = {email: email, "cards.store": cardName}
+
+        const user = await coll.findOne(query);
+        if (user == null){
+            throw Error("Unable to find user");
+        }
+
+        let card = null;
+        user.cards.forEach((v) => {
+            if (v.store == cardName){
+                card = new Card(v.store, v.barcode, v.color, v.logo);
+            }
+        });
+        if (card == null){
+            throw Error("Unable to find card");
+        }
+        return {card: card.toJSON()};
+    }catch(err){
+        console.log(`[getUserCard] ERROR: ${err}`);
+    }
+    return {card: null};
+}
+
 async function createCard(card, user){
     try{
         const db = await connectToDB();
         const coll = db.collection('users');
         const query = {email: user.email};
 
-        const res = await coll.updateOne(query, {$push: {cards: card.toJSON()}});
+        let updated = false;
+        const cardsRes = await getCardsByEmail(user.email);
+        cardsRes.cards.forEach((v, k) => {
+            if (v.store == card.store){
+                cardsRes.cards[k] = card.toJSON();
+                updated = true;
+            }
+        });
+
+        if (!updated){
+            cardsRes.cards.push(card.toJSON());
+        }
+
+        await coll.updateOne(query, {$set: {"cards": cardsRes.cards}});
         return true;
     }catch(err){
         console.log(`[createCard] ERROR: ${err}`);
@@ -194,6 +234,18 @@ app.post('/getcards', (req, res) => {
     });
 });
 
+app.post('/getcard', (req, res) => {
+    const email = req.body.email;
+    const cardName = req.body.card;
+
+    getUserCard(cardName, email).then(result => {
+        if (result.card == null){
+            return res.status(400).send({error: `Unable to get card`});
+        }
+        return res.status(200).send({card: result.card});
+    })
+});
+
 app.post('/addcard', (req, res) => {
     const store = req.body.store;
     const barcode = req.body.barcode;
@@ -205,7 +257,7 @@ app.post('/addcard', (req, res) => {
 
     createCard(card, user).then(success => {
         if (success){
-            console.log(`Successfully created card ${store} for ${user.email}`);
+            console.log(`Successfully created/updated card ${store} for ${user.email}`);
             return res.status(200).send({card: card.toJSON()});
         }
         return res.status(400).send({error: "An error occured while creating the card"});
