@@ -27,25 +27,6 @@ async function connectToDB(){
     return mongoClient.db('all_cards');
 }
 
-async function userExists(email){
-    let user;
-    try{
-        const db = await connectToDB();
-        const usersColl = db.collection('users');
-
-        const query = {email: email};
-
-        user = await usersColl.findOne(query);
-        if (user == null){
-            return {exists: false};
-        }
-    }catch(err){
-        console.log(`[userExists] ERROR: ${err}`);
-        return;
-    }
-    return {exists: true, id: user._id, email: user.email, password: user.password, country: user.country, cards: user.cards};
-}
-
 async function getUserByEmail(email){
     let user;
     try{
@@ -183,16 +164,6 @@ app.post('/login', (req, res) => {
         }
         return res.status(400).send({error: "Incorrect email or password."});
     });
-    // userExists(email).then(result => {
-    //     if (!result?.exists){
-    //         return res.status(400).send({error: `User ${email} does NOT exist. Please sign up.`});
-    //     }
-        // if (bcrypt.compareSync(password, result.password)){
-        //     console.log(`Logged in as ${email}`);
-        //     return res.status(200).send({email: result.email});
-        // }
-    //     return res.status(400).send({error: "Incorrect email or password."});
-    // });
 });
 
 app.post('/signup', (req, res) => {
@@ -209,9 +180,10 @@ app.post('/signup', (req, res) => {
 
     const encryptedPass = bcrypt.hashSync(password, 10);
 
-    userExists(email).then(result => {
-        if (result?.exists){
-            return res.status(400).send({error: `User with email ${result.email} already exists.`}); 
+    // Check if user exists before creating
+    getUserByEmail(email).then(result => {
+        if (result.user != null){
+            return res.status(400).send({error: `User with email ${email} already exists.`}); 
         }
         createUser(email, encryptedPass).then(success => {
             if (success){
@@ -219,7 +191,7 @@ app.post('/signup', (req, res) => {
                 return res.status(200).send({email: email});
             }
             return res.status(400).send({error: "An error occured while creating the user"});
-        })
+        });
     });
 });
 
