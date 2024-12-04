@@ -8,9 +8,6 @@ export default function CardsScreen() {
   const [cards, setCards] = useState(new Array<any>());
   const navigation = useNavigation();
 
-  const whoami = async (card: any) => {
-  }
-
   useEffect(() => {
     getCardList();
   }, []);

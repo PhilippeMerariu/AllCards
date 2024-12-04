@@ -36,6 +36,13 @@
       ],
       [
         "@react-native-google-signin/google-signin"
+      ],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+          "enableCodeScanner": true
+        }
       ]
     ],
     "experiments": {

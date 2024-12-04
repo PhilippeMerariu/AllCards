@@ -26,7 +26,6 @@ export default function CardFormScreen({}) {
 
   const getCardInfo = async (cardName) => {
     const user = await storage.getUser();
-
     const res = await fetch(`${constants.SERVER_URL}/getcard`, {
       method: "POST",
       headers: {
@@ -76,6 +75,10 @@ export default function CardFormScreen({}) {
     }
   };
 
+  const handleBarcode = () => {
+    router.push("/barcodeScanner");
+  };
+
   return (
     <View style={styles.page}>
       <TextInput 
@@ -111,6 +114,9 @@ export default function CardFormScreen({}) {
         onSubmitEditing={handleAddCard}/>
       <Pressable style={styles.signupButton} onPress={handleAddCard}>
         <Text style={styles.buttonText}>Add Card</Text>
+      </Pressable>
+      <Pressable style={styles.signupButton} onPress={handleBarcode}>
+        <Text style={styles.buttonText}>BARCODE</Text>
       </Pressable>
     </View>
   );
