@@ -49,10 +49,13 @@ export default function BarcodeScannerScreen({}) {
                 style={styles.actionButton}
                 underlayColor={'lightgray'}
                 onPress={() => {alert("snap!")}}>
-                <Image
-                    style={{width: 100, height: 100}} 
-                    source={require('@/assets/images/apple.png')}
-                />
+                <></>
+            </TouchableHighlight>
+            <TouchableHighlight 
+                style={styles.scanSection}
+                underlayColor={'lightgray'}
+                onPress={() => {alert("snap!")}}>
+                <></>
             </TouchableHighlight>
         </View>
     );
@@ -67,13 +70,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionButton: {
-        position: 'absolute',
-        bottom: 25,
-        padding: 16,
-        right: 20,
-        left: 20,
-        borderRadius: 20,
-        alignItems: 'center',
+        width: 100,
+        height: 100,
+        borderWidth: 8,
+        borderColor: 'lightgray',
+        borderRadius: 50,
+        position: "absolute",
+        bottom: 30,
+        alignSelf: "center"
   },
+  scanSection: {
+    borderWidth: 8,
+    borderRadius: 20,
+    borderColor: "lightgray",
+    width: 350,
+    height: 200,
+    position: "absolute",
+    alignSelf: "center",
+    top: 250
+  }
 });
 

@@ -1,16 +1,18 @@
-import { StyleSheet, View, Text, Pressable, TextInput} from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, Image} from 'react-native';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
 import * as constants from '@/utilities/constants';
 import { useRoute } from '@react-navigation/native';
+import bwipjs from '@bwip-js/react-native';
 
 export default function CardFormScreen({}) {
   const [store, setStore] = useState("");
   const [barcode, setBarcode] = useState("");
   const [color, setColor] = useState("");
   const [logo, setLogo] = useState("");
+  const [barcodeObject, setBarcodeObject] = useState({width: 0, height: 0, uri: ""});
 
   const barcodeInputRef = useRef<TextInput>(null);
   const colorInputRef = useRef<TextInput>(null);
@@ -21,6 +23,7 @@ export default function CardFormScreen({}) {
   useEffect(() => {
     if (route.params?.card){
       getCardInfo(route.params?.card);
+      generateBarcode();
     }
   }, []);
 
@@ -79,6 +82,17 @@ export default function CardFormScreen({}) {
     router.push("/barcodeScanner");
   };
 
+  const generateBarcode = async () => {
+    let img;
+    try {
+      img = await bwipjs.toDataURL({bcid: "code128", text: "hello"});
+      setBarcodeObject(img);
+      console.log(img);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   return (
     <View style={styles.page}>
       <TextInput 
@@ -118,6 +132,10 @@ export default function CardFormScreen({}) {
       <Pressable style={styles.signupButton} onPress={handleBarcode}>
         <Text style={styles.buttonText}>BARCODE</Text>
       </Pressable>
+      <Image 
+        style={{width: barcodeObject.width, height: barcodeObject.height}}
+        source={{uri:barcodeObject.uri}}
+      />
     </View>
   );
 }
