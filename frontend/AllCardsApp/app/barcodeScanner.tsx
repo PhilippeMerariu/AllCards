@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Pressable, TextInput } from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, TouchableHighlight, Image } from 'react-native';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
@@ -10,7 +10,9 @@ import { useCameraPermission, useCameraDevice, Camera, useCodeScanner } from 're
 // const { hasPermission, requestPermission } = useCameraPermission()
 
 export default function BarcodeScannerScreen({}) {
-    const device = useCameraDevice('back')
+    const device = useCameraDevice(
+        'back'
+    )
     const { hasPermission, requestPermission } = useCameraPermission()
     const codeScanner = useCodeScanner({
         codeTypes: ['qr', 'ean-13'],
@@ -36,46 +38,42 @@ export default function BarcodeScannerScreen({}) {
 
 
     return (
-        <Camera
-            style={StyleSheet.absoluteFill}
-            device={device}
-            isActive={true}
-            codeScanner={codeScanner}
-        />
+        <View style={styles.page}>
+            <Camera
+                style={styles.preview}
+                device={device}
+                isActive={true}
+                codeScanner={codeScanner}
+            />
+            <TouchableHighlight 
+                style={styles.actionButton}
+                underlayColor={'lightgray'}
+                onPress={() => {alert("snap!")}}>
+                <Image
+                    style={{width: 100, height: 100}} 
+                    source={require('@/assets/images/apple.png')}
+                />
+            </TouchableHighlight>
+        </View>
     );
 }
 
-// const styles = StyleSheet.create({
-//   page: {
-//     backgroundColor: "#CCCCCC",
-//     flex: 1
-//   },
-//   signupButton: {
-//     backgroundColor: "#FFFFFF",
-//     width: 300,
-//     height: 40,
-//     borderRadius: 10,
-//     alignSelf: "center",
-//     justifyContent: "center",
-//     marginTop: 20
-//   },
-//   buttonText: {
-//     color: "#000000",
-//     textAlign: "center",
-//     fontWeight: "bold"
-//   },
-//   inputboxes: {
-//     color: "#000000",
-//     backgroundColor: "#ffffff",
-//     borderColor: "#000000",
-//     borderWidth: 2,
-//     borderRadius: 10,
-//     width: 300,
-//     height: 40,
-//     marginTop: 20,
-//     alignSelf: "center",
-//     textAlign: "left",
-//     paddingLeft: 10
-//   }
-// });
+const styles = StyleSheet.create({
+  page: {
+    backgroundColor: "#CCCCCC",
+    flex: 1
+  },
+  preview: {
+    flex: 1,
+  },
+  actionButton: {
+        position: 'absolute',
+        bottom: 25,
+        padding: 16,
+        right: 20,
+        left: 20,
+        borderRadius: 20,
+        alignItems: 'center',
+  },
+});
 
