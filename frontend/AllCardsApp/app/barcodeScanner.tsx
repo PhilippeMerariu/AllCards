@@ -5,20 +5,27 @@ import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
 import * as constants from '@/utilities/constants';
 import { useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useCameraPermission, useCameraDevice, Camera, useCodeScanner } from 'react-native-vision-camera'
 
 // const { hasPermission, requestPermission } = useCameraPermission()
 
 export default function BarcodeScannerScreen({}) {
+    // const [barcode, setBarcode] = useState("");
+    const navigation = useNavigation<any>();
     const device = useCameraDevice(
         'back'
     )
     const { hasPermission, requestPermission } = useCameraPermission()
     const codeScanner = useCodeScanner({
-        codeTypes: ['qr', 'ean-13'],
+        codeTypes: ['ean-13'],
         onCodeScanned: (codes) => {
             for (const code of codes){
-                console.log(`Scanned ${code.type} code => ${code.value}`);
+                // console.log(`Scanned ${code.type} code => ${code.value}`);
+                if (code.value){
+                    // setBarcode(code.value);
+                    navigation.popTo("cardForm", {barcode: code.value});
+                }
             }
         //   console.log(`Scanned ${codes} code!`)
         }

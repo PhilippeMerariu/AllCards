@@ -5,15 +5,13 @@ import * as constants from '@/utilities/constants';
 import { images } from '@/utilities/imageImporter';
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 
 // const pngImages = require.context("./../../assets/images", true, /\.png$/);
 
 export default function CardsScreen() {
   const [cards, setCards] = useState(new Array<any>());
-
-  const whoami = async (card: any) => {
-    displayMessage(`${card.store}: ${card.barcode}`);
-  }
+  const navigation = useNavigation();
 
   useEffect(() => {
     getCards();
@@ -51,6 +49,10 @@ export default function CardsScreen() {
   //   return imgSources.get(`./${card.logo}`).uri;
   // }
 
+  const handleSelectCard = (card) => {
+    navigation.navigate("cardForm", {card: card})
+  }
+
   const addCard = () => {
     router.push("/cardList");
   }
@@ -67,7 +69,7 @@ export default function CardsScreen() {
       <FlatList
         data={cards} 
         renderItem={({item}) =>
-          <Pressable style={[styles.cardTiles, {backgroundColor: cardColor(item)}]} onPress={() => {whoami(item)}}>
+          <Pressable style={[styles.cardTiles, {backgroundColor: cardColor(item)}]} onPress={() => {handleSelectCard(item)}}>
             <Image 
               // source={{uri:getCardImage(item)}}
               source={images.get(item.store)}

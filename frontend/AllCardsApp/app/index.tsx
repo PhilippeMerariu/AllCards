@@ -40,7 +40,7 @@ export default function LoginScreen({}) {
   const handleEmailLogin = async () => { 
     if (!validateInfo()){
       return;
-    }  
+    }
     const res = await fetch(`${constants.SERVER_URL}/login`, {
       method: "POST",
       headers: {

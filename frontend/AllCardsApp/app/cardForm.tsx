@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
 import * as constants from '@/utilities/constants';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useFocusEffect, useNavigation } from '@react-navigation/native';
 import bwipjs from '@bwip-js/react-native';
 
 export default function CardFormScreen({}) {
@@ -19,34 +19,57 @@ export default function CardFormScreen({}) {
   const logoInputRef = useRef<TextInput>(null);
 
   const route = useRoute();
+  const navigation = useNavigation<any>();
 
   useEffect(() => {
+    console.log("mount effect");
     if (route.params?.card){
-      getCardInfo(route.params?.card);
-      generateBarcode();
+      setStore(route.params?.card.store);
+      setBarcode(route.params?.card.barcode);
+      setColor(route.params?.card.color);
+      setLogo(route.params?.card.logo);
     }
   }, []);
 
-  const getCardInfo = async (cardName) => {
-    const user = await storage.getUser();
-    const res = await fetch(`${constants.SERVER_URL}/getcard`, {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({email: user.email, card: cardName})
-    });
-    const resjson = await res.json();
-    if (res.ok){
-      setStore(resjson.card.store);
-      setBarcode(resjson.card.barcode);
-      setColor(resjson.card.color);
-      setLogo(resjson.card.logo);
-    }else{
-      displayMessage(`ERROR: ${resjson.error}`);
+  useEffect(() => {
+    console.log("barcode effect");
+    generateBarcode();
+    return () => {
+      if (route.params?.barcode){
+        // FIXME: avoid resetting params when navigating to other screen...
+        navigation.setParams({barcode: undefined});
+      }
     }
-  }
+  }, [barcode])
+
+  useFocusEffect(() => {
+    console.log("focus effect");
+    if (route.params?.barcode){
+      console.log("focus setting barcode", route.params?.barcode);
+      setBarcode(route.params?.barcode);
+    }
+  });
+
+  // const getCardInfo = async (cardName) => {
+  //   const user = await storage.getUser();
+  //   const res = await fetch(`${constants.SERVER_URL}/getcard`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Accept": "application/json",
+  //       "Content-Type": "application/json"
+  //     },
+  //     body: JSON.stringify({email: user.email, card: cardName})
+  //   });
+  //   const resjson = await res.json();
+  //   if (res.ok){
+  //     setStore(resjson.card.store);
+  //     setBarcode(resjson.card.barcode);
+  //     setColor(resjson.card.color);
+  //     setLogo(resjson.card.logo);
+  //   }else{
+  //     displayMessage(`ERROR: ${resjson.error}`);
+  //   }
+  // }
 
   const validateCardData = () => {
     if (!store || !barcode || !color){
@@ -72,6 +95,7 @@ export default function CardFormScreen({}) {
     });
     const resjson = await res.json();
     if (res.ok){
+      console.log("moving to cards screen");
       router.replace("/cards");
     }else{
       displayMessage(`ERROR: ${resjson.error}`);
@@ -85,9 +109,8 @@ export default function CardFormScreen({}) {
   const generateBarcode = async () => {
     let img;
     try {
-      img = await bwipjs.toDataURL({bcid: "code128", text: "hello"});
+      img = await bwipjs.toDataURL({bcid: "ean13", text: barcode});
       setBarcodeObject(img);
-      console.log(img);
     } catch (e) {
       console.log(e);
     }
