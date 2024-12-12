@@ -138,6 +138,34 @@ async function createCard(card, user){
     }
     return false;
 }
+
+async function deleteCard(card, user){
+    try{
+        const db = await connectToDB();
+        const coll = db.collection('users');
+        const query = {email: user.email};
+
+        const cardsRes = await getCardsByEmail(user.email);
+        let index = -1;
+        for (let i = 0; i < cardsRes.cards.length; i++){
+            if (cardsRes.cards[i].store == card){
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1){
+            throw Error("Unable to delete card");
+        }
+
+        cardsRes.cards.splice(index, 1);
+        await coll.updateOne(query, {$set: {"cards": cardsRes.cards}});
+        return true;
+    }catch(err){
+        console.log(`[deleteCard] ERROR ${err}`);
+    }
+    return false;
+}
 //################################################
 
 //#################### ROUTES ####################
@@ -235,6 +263,19 @@ app.post('/addcard', (req, res) => {
         return res.status(400).send({error: "An error occured while creating the card"});
     });
 
+});
+
+app.delete('/card', (req, res) => {
+    const user = req.body.user;
+    const card = req.body.card;
+
+    deleteCard(card, user).then(success => {
+        if (success){
+            console.log(`Successfully deleted card ${card} from ${user.email}`);
+            return res.status(200).send({card: card});
+        }
+        return res.status(400).send({error: "An error occured while deleting the card"});
+    });
 });
 //################################################
 

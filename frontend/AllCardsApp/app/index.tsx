@@ -78,14 +78,16 @@ export default function LoginScreen({}) {
           headerRight: () => <Button onPress={plusButton} title='hello'/>
         }}
       />
+      <Text style={[styles.inputLabels, {marginTop: 50}]}>Email</Text>
       <TextInput 
-        style={[styles.inputboxes, {marginTop: 50}]}
+        style={styles.inputboxes}
         placeholder="Email"
         placeholderTextColor={'gray'}
         autoCapitalize="none"
         autoCorrect={false}
         onChangeText={u => setEmail(u)}
         onSubmitEditing={() => { passwordInputRef.current?.focus() }}/>
+      <Text style={[styles.inputLabels, {marginTop: 20}]}>Password</Text>
       <TextInput
         style={styles.inputboxes}
         placeholder="Password"
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 300,
     height: 40,
-    marginTop: 20,
+    marginTop: 5,
     alignSelf: "center",
     textAlign: "left",
     paddingLeft: 10
@@ -155,5 +157,13 @@ const styles = StyleSheet.create({
   signupLink: {
     fontWeight: "500",
     color: 'blue'
+  },
+  inputLabels: {
+    width: 300,
+    height: "auto",
+    alignSelf: "center",
+    textAlign: "left",
+    fontWeight: "bold",
+    fontSize: 18
   }
 });

@@ -1,11 +1,12 @@
-import { StyleSheet, View, Text, Pressable, TextInput, Image} from 'react-native';
-import { router } from 'expo-router';
+import { StyleSheet, View, Text, Pressable, TextInput, Image, Button, TouchableHighlight} from 'react-native';
+import { router, Stack } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
 import * as constants from '@/utilities/constants';
 import { useRoute, useFocusEffect, useNavigation } from '@react-navigation/native';
 import bwipjs from '@bwip-js/react-native';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 export default function CardFormScreen({}) {
   const [store, setStore] = useState("");
@@ -13,6 +14,7 @@ export default function CardFormScreen({}) {
   const [color, setColor] = useState("");
   const [logo, setLogo] = useState("");
   const [barcodeObject, setBarcodeObject] = useState({width: 0, height: 0, uri: ""});
+  const [pageTitle, setPageTitle] = useState("New Card");
 
   const barcodeInputRef = useRef<TextInput>(null);
   const colorInputRef = useRef<TextInput>(null);
@@ -22,17 +24,16 @@ export default function CardFormScreen({}) {
   const navigation = useNavigation<any>();
 
   useEffect(() => {
-    console.log("mount effect");
     if (route.params?.card){
       setStore(route.params?.card.store);
       setBarcode(route.params?.card.barcode);
       setColor(route.params?.card.color);
       setLogo(route.params?.card.logo);
+      setPageTitle("Edit Card");
     }
   }, []);
 
   useEffect(() => {
-    console.log("barcode effect");
     generateBarcode();
     return () => {
       if (route.params?.barcode){
@@ -43,9 +44,7 @@ export default function CardFormScreen({}) {
   }, [barcode])
 
   useFocusEffect(() => {
-    console.log("focus effect");
     if (route.params?.barcode){
-      console.log("focus setting barcode", route.params?.barcode);
       setBarcode(route.params?.barcode);
     }
   });
@@ -95,7 +94,25 @@ export default function CardFormScreen({}) {
     });
     const resjson = await res.json();
     if (res.ok){
-      console.log("moving to cards screen");
+      router.replace("/cards");
+    }else{
+      displayMessage(`ERROR: ${resjson.error}`);
+    }
+  };
+
+  const handleDeleteCard = async () => {
+    const user = await storage.getUser();
+
+    const res = await fetch(`${constants.SERVER_URL}/card`, {
+      method: "DELETE",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({card: store, user: user})
+    });
+    const resjson = await res.json();
+    if (res.ok){
       router.replace("/cards");
     }else{
       displayMessage(`ERROR: ${resjson.error}`);
@@ -118,6 +135,30 @@ export default function CardFormScreen({}) {
 
   return (
     <View style={styles.page}>
+      <Stack.Screen 
+        options={{
+          title: pageTitle,
+          headerRight: () => (
+            <View style={{flexDirection: "row"}}>
+              <TouchableHighlight
+                style={styles.headerButtons}
+                underlayColor={'lightblue'}
+                onPress={handleDeleteCard}
+              >
+                <IconSymbol size={28} name="delete.fill" color={'white'} />
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={styles.headerButtons}
+                underlayColor={'lightblue'}
+                onPress={handleAddCard}
+              >
+                <IconSymbol size={28} name="save.fill" color={'white'} />
+              </TouchableHighlight>
+            </View>
+          )
+          
+        }}
+      />
       <TextInput 
         style={styles.inputboxes}
         placeholder="Store"
@@ -167,6 +208,12 @@ const styles = StyleSheet.create({
   page: {
     backgroundColor: "#CCCCCC",
     flex: 1
+  },
+  headerButtons: {
+    width: 30,
+    height: 30,
+    borderRadius: 2,
+    marginLeft: 20
   },
   signupButton: {
     backgroundColor: "#FFFFFF",

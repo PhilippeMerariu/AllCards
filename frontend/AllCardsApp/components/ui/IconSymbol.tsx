@@ -7,8 +7,8 @@ const MAPPING = {
   // icons: https://icons.expo.fyi
   'house.fill': 'home',
   'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
-  'chevron.right': 'chevron-right',
+  'save.fill': 'save',
+  'delete.fill': 'delete',
   'settings.fill': 'settings',
   'cards.fill': 'style'
 } as Partial<
