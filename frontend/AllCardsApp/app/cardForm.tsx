@@ -159,6 +159,7 @@ export default function CardFormScreen({}) {
           
         }}
       />
+      <Text style={[styles.inputLabels, {marginTop: 50}]}>Card Name</Text>
       <TextInput 
         style={styles.inputboxes}
         placeholder="Store"
@@ -166,6 +167,14 @@ export default function CardFormScreen({}) {
         defaultValue={store}
         onChangeText={s => setStore(s)}
         onSubmitEditing={() => {barcodeInputRef.current?.focus()}}/>
+      <Text style={[styles.inputLabels]}>Barcode</Text>
+      <Pressable style={styles.bardcodeButton} onPress={handleBarcode}>
+        <Text style={styles.buttonText}>BARCODE</Text>
+      </Pressable>
+      <Image 
+        style={[styles.barcodeImage, {width: barcodeObject.width, height: barcodeObject.height}]}
+        source={{uri:barcodeObject.uri}}
+      />
       <TextInput 
         style={styles.inputboxes}
         placeholder="Barcode"
@@ -174,6 +183,7 @@ export default function CardFormScreen({}) {
         defaultValue={barcode}
         onChangeText={b => setBarcode(b)}
         onSubmitEditing={() => {colorInputRef.current?.focus()}}/>
+      <Text style={[styles.inputLabels]}>Color</Text>
       <TextInput 
         style={styles.inputboxes}
         placeholder="Color"
@@ -182,7 +192,8 @@ export default function CardFormScreen({}) {
         defaultValue={color}
         onChangeText={c => setColor(c)}
         onSubmitEditing={() => {logoInputRef.current?.focus()}}/>
-        <TextInput 
+      <Text style={[styles.inputLabels]}>Logo</Text>
+      <TextInput 
         style={styles.inputboxes}
         placeholder="Logo"
         placeholderTextColor={'gray'}
@@ -190,16 +201,6 @@ export default function CardFormScreen({}) {
         defaultValue={logo}
         onChangeText={l => setLogo(l)}
         onSubmitEditing={handleAddCard}/>
-      <Pressable style={styles.signupButton} onPress={handleAddCard}>
-        <Text style={styles.buttonText}>Add Card</Text>
-      </Pressable>
-      <Pressable style={styles.signupButton} onPress={handleBarcode}>
-        <Text style={styles.buttonText}>BARCODE</Text>
-      </Pressable>
-      <Image 
-        style={{width: barcodeObject.width, height: barcodeObject.height}}
-        source={{uri:barcodeObject.uri}}
-      />
     </View>
   );
 }
@@ -215,14 +216,14 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     marginLeft: 20
   },
-  signupButton: {
+  bardcodeButton: {
     backgroundColor: "#FFFFFF",
     width: 300,
     height: 40,
     borderRadius: 10,
     alignSelf: "center",
     justifyContent: "center",
-    marginTop: 20
+    marginTop: 5
   },
   buttonText: {
     color: "#000000",
@@ -237,9 +238,22 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 300,
     height: 40,
-    marginTop: 20,
+    marginTop: 5,
     alignSelf: "center",
     textAlign: "left",
     paddingLeft: 10
+  },
+  inputLabels: {
+    width: 300,
+    height: "auto",
+    alignSelf: "center",
+    textAlign: "left",
+    fontWeight: "bold",
+    fontSize: 18,
+    marginTop: 20
+  },
+  barcodeImage: {
+    alignSelf: "center",
+    margin: 10
   }
 });

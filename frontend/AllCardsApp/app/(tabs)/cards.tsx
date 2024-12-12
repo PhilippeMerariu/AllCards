@@ -1,11 +1,12 @@
-import { StyleSheet, Pressable, Text, FlatList, View, Image } from 'react-native';
+import { StyleSheet, Pressable, FlatList, View, Image, TouchableHighlight } from 'react-native';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
 import * as constants from '@/utilities/constants';
 import { images } from '@/utilities/imageImporter';
 import { useEffect, useState } from 'react';
-import { router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 // const pngImages = require.context("./../../assets/images", true, /\.png$/);
 
@@ -53,7 +54,7 @@ export default function CardsScreen() {
     navigation.navigate("cardForm", {card: card})
   }
 
-  const addCard = () => {
+  const handleAddCard = () => {
     router.push("/cardList");
   }
 
@@ -63,9 +64,19 @@ export default function CardsScreen() {
 
   return (
     <View style={styles.page}>
-      <Pressable style={{backgroundColor: 'gray', width: 100, height: 30}} onPress={addCard}>
-        <Text>ADD CARD</Text>
-      </Pressable>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <TouchableHighlight
+                style={styles.headerButton}
+                underlayColor={'lightblue'}
+                onPress={handleAddCard}
+              >
+                <IconSymbol size={28} name="add.icon" color={'white'} />
+              </TouchableHighlight>
+          )
+        }}
+      />
       <FlatList
         data={cards} 
         renderItem={({item}) =>
@@ -83,14 +94,14 @@ export default function CardsScreen() {
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  page: {
+    flex: 1
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  headerButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 2,
+    marginRight: 15
   },
   cardLogo: {
     width: "60%",
@@ -98,9 +109,6 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     alignSelf: "center",
     marginVertical: "auto"
-  },
-  page: {
-    flex: 1
   },
   cardTiles:{
     width: "42%",

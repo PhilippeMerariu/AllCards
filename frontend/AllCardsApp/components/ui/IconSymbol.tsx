@@ -6,7 +6,7 @@ import { OpaqueColorValue, StyleProp, ViewStyle } from 'react-native';
 const MAPPING = {
   // icons: https://icons.expo.fyi
   'house.fill': 'home',
-  'paperplane.fill': 'send',
+  'add.icon': 'add',
   'save.fill': 'save',
   'delete.fill': 'delete',
   'settings.fill': 'settings',
