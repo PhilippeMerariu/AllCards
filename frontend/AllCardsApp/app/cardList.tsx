@@ -21,7 +21,7 @@ export default function CardsScreen() {
   }
 
   const handleSelectedCard = (card) => {
-    navigation.navigate("cardForm", {card: card.key});
+    navigation.navigate("cardForm", {cardName: card.key});
   }
 
   const handleCustomCard = () => {

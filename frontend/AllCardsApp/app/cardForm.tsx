@@ -1,12 +1,13 @@
-import { StyleSheet, View, Text, Pressable, TextInput, Image, Button, TouchableHighlight} from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, Image, TouchableHighlight, Modal, Alert} from 'react-native';
 import { router, Stack } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
 import * as constants from '@/utilities/constants';
 import { useRoute, useFocusEffect, useNavigation } from '@react-navigation/native';
 import bwipjs from '@bwip-js/react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import ColorPicker, { Panel1, Swatches, Preview, OpacitySlider, HueSlider } from 'reanimated-color-picker';
 
 export default function CardFormScreen({}) {
   const [store, setStore] = useState("");
@@ -15,10 +16,8 @@ export default function CardFormScreen({}) {
   const [logo, setLogo] = useState("");
   const [barcodeObject, setBarcodeObject] = useState({width: 0, height: 0, uri: ""});
   const [pageTitle, setPageTitle] = useState("New Card");
-
-  const barcodeInputRef = useRef<TextInput>(null);
-  const colorInputRef = useRef<TextInput>(null);
-  const logoInputRef = useRef<TextInput>(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [colorSelected, setColorSelected] = useState("")
 
   const route = useRoute();
   const navigation = useNavigation<any>();
@@ -30,6 +29,9 @@ export default function CardFormScreen({}) {
       setColor(route.params?.card.color);
       setLogo(route.params?.card.logo);
       setPageTitle("Edit Card");
+    }else if (route.params?.cardName){
+      setStore(route.params?.cardName);
+      setPageTitle("New Card");
     }
   }, []);
 
@@ -48,27 +50,6 @@ export default function CardFormScreen({}) {
       setBarcode(route.params?.barcode);
     }
   });
-
-  // const getCardInfo = async (cardName) => {
-  //   const user = await storage.getUser();
-  //   const res = await fetch(`${constants.SERVER_URL}/getcard`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Accept": "application/json",
-  //       "Content-Type": "application/json"
-  //     },
-  //     body: JSON.stringify({email: user.email, card: cardName})
-  //   });
-  //   const resjson = await res.json();
-  //   if (res.ok){
-  //     setStore(resjson.card.store);
-  //     setBarcode(resjson.card.barcode);
-  //     setColor(resjson.card.color);
-  //     setLogo(resjson.card.logo);
-  //   }else{
-  //     displayMessage(`ERROR: ${resjson.error}`);
-  //   }
-  // }
 
   const validateCardData = () => {
     if (!store || !barcode || !color){
@@ -100,6 +81,16 @@ export default function CardFormScreen({}) {
     }
   };
 
+  const deleteConfirmationAlert = () =>
+    Alert.alert(`Are you sure you want to delete the \"${store}\" card?`, '', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'OK', onPress: handleDeleteCard},
+    ]);
+
   const handleDeleteCard = async () => {
     const user = await storage.getUser();
 
@@ -126,11 +117,20 @@ export default function CardFormScreen({}) {
   const generateBarcode = async () => {
     let img;
     try {
-      img = await bwipjs.toDataURL({bcid: "ean13", text: barcode});
+      img = await bwipjs.toDataURL({bcid: "ean13", text: barcode, includetext: true});
       setBarcodeObject(img);
     } catch (e) {
       console.log(e);
     }
+  }
+
+  const onSelectColor = ({ hex }) => {
+    setColorSelected(hex);
+  };
+
+  const onConfirmColor = () => {
+    setColor(colorSelected);
+    setShowColorPicker(false);
   }
 
   return (
@@ -143,7 +143,7 @@ export default function CardFormScreen({}) {
               <TouchableHighlight
                 style={styles.headerButtons}
                 underlayColor={'lightblue'}
-                onPress={handleDeleteCard}
+                onPress={deleteConfirmationAlert}
               >
                 <IconSymbol size={28} name="delete.fill" color={'white'} />
               </TouchableHighlight>
@@ -159,48 +159,54 @@ export default function CardFormScreen({}) {
           
         }}
       />
+
       <Text style={[styles.inputLabels, {marginTop: 50}]}>Card Name</Text>
       <TextInput 
         style={styles.inputboxes}
-        placeholder="Store"
+        placeholder="Card Name"
         placeholderTextColor={'gray'}
         defaultValue={store}
-        onChangeText={s => setStore(s)}
-        onSubmitEditing={() => {barcodeInputRef.current?.focus()}}/>
+        onChangeText={s => setStore(s)}/>
+
       <Text style={[styles.inputLabels]}>Barcode</Text>
       <Pressable style={styles.bardcodeButton} onPress={handleBarcode}>
-        <Text style={styles.buttonText}>BARCODE</Text>
+        <Text style={styles.buttonText}>Scan Barcode</Text>
       </Pressable>
       <Image 
         style={[styles.barcodeImage, {width: barcodeObject.width, height: barcodeObject.height}]}
         source={{uri:barcodeObject.uri}}
       />
-      <TextInput 
-        style={styles.inputboxes}
-        placeholder="Barcode"
-        placeholderTextColor={'gray'}
-        ref={barcodeInputRef}
-        defaultValue={barcode}
-        onChangeText={b => setBarcode(b)}
-        onSubmitEditing={() => {colorInputRef.current?.focus()}}/>
+
       <Text style={[styles.inputLabels]}>Color</Text>
-      <TextInput 
-        style={styles.inputboxes}
-        placeholder="Color"
-        placeholderTextColor={'gray'}
-        ref={colorInputRef}
-        defaultValue={color}
-        onChangeText={c => setColor(c)}
-        onSubmitEditing={() => {logoInputRef.current?.focus()}}/>
+      <Pressable style={[styles.colorPreview, {backgroundColor: color}]} onPress={() => setShowColorPicker(true)}></Pressable>
+      
       <Text style={[styles.inputLabels]}>Logo</Text>
       <TextInput 
         style={styles.inputboxes}
         placeholder="Logo"
         placeholderTextColor={'gray'}
-        ref={logoInputRef}
         defaultValue={logo}
         onChangeText={l => setLogo(l)}
-        onSubmitEditing={handleAddCard}/>
+        onSubmitEditing={handleAddCard}
+        editable={false}
+        selectTextOnFocus={false}/>
+
+      <Modal visible={showColorPicker} animationType='slide'>
+        <ColorPicker style={styles.colorPickerSection} value={color} onComplete={onSelectColor}>
+          <Preview style={[styles.colorPickerElements, styles.colorPickerPreview]} hideText={true}/>
+          <Panel1 style={styles.colorPickerElements}/>
+          <HueSlider style={styles.colorPickerElements}/>
+          <OpacitySlider style={styles.colorPickerElements}/>
+        </ColorPicker>
+        <View style={styles.colorPickerButtonView}>
+          <Pressable style={styles.colorPickerButtons} onPress={() => setShowColorPicker(false)}>
+            <Text style={styles.colorPickerButtonText}>Cancel</Text>
+          </Pressable>
+          <Pressable style={styles.colorPickerButtons} onPress={onConfirmColor}>
+            <Text style={styles.colorPickerButtonText}>OK</Text>
+          </Pressable>
+        </View>  
+      </Modal>
     </View>
   );
 }
@@ -255,5 +261,42 @@ const styles = StyleSheet.create({
   barcodeImage: {
     alignSelf: "center",
     margin: 10
+  },
+  colorPreview: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginLeft: 55
+  },
+  colorPickerSection: {
+    width: "80%",
+    alignSelf: "center",
+    marginTop: 80,
+  },
+  colorPickerElements: {
+    marginBottom: 15
+  },
+  colorPickerPreview: {
+    borderWidth: 2,
+    height: 40
+  },
+  colorPickerButtonView: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 40
+  },
+  colorPickerButtons: {
+    width: 100,
+    height: 40,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 2,
+    justifyContent: "center"
+  },
+  colorPickerButtonText: {
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold"
   }
 });
