@@ -5,6 +5,7 @@ import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
 import * as constants from '@/utilities/constants';
 import * as EmailValidator from 'email-validator';
+import Loader from '@/components/Loader';
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 // GoogleSignin.configure({
@@ -22,6 +23,7 @@ export default function LoginScreen({}) {
   const [count, setCount] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const passwordInputRef = useRef<TextInput>(null);
 
@@ -41,6 +43,9 @@ export default function LoginScreen({}) {
     if (!validateInfo()){
       return;
     }
+
+    setIsLoading(true);
+    
     const res = await fetch(`${constants.SERVER_URL}/login`, {
       method: "POST",
       headers: {
@@ -59,6 +64,7 @@ export default function LoginScreen({}) {
       console.log("ERROR:", resjson.error);
       displayMessage(`ERROR: ${resjson.error}`);
     }
+    setIsLoading(false);
   };
   
   const handleGoogleLogin = async () => {
@@ -109,6 +115,7 @@ export default function LoginScreen({}) {
           <Text style={styles.buttonText}>TEST</Text>
         </Pressable>
       </Link>
+      <Loader isLoading={isLoading} />
     </View>
   );
 }

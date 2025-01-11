@@ -7,15 +7,19 @@ import { useEffect, useState } from 'react';
 import { router, Stack } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import Loader from '@/components/Loader';
 
 // const pngImages = require.context("./../../assets/images", true, /\.png$/);
 
 export default function CardsScreen() {
   const [cards, setCards] = useState(new Array<any>());
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigation = useNavigation();
 
   useEffect(() => {
-    getCards();
+    setIsLoading(true);
+    setTimeout(() => getCards(), 1000);
   }, []);
 
   const getCards = async () => {
@@ -38,6 +42,7 @@ export default function CardsScreen() {
       displayMessage(`ERROR: ${resjson.error}`);
       setCards([]);
     }
+    setIsLoading(false);
   }
 
   // not working on mobile
@@ -89,6 +94,7 @@ export default function CardsScreen() {
           </Pressable>
         }
         numColumns={2}/>
+        <Loader isLoading={isLoading} />
     </View>
   );
 }
