@@ -87,7 +87,7 @@ export default function CardsScreen() {
         renderItem={({item}) =>
           <Pressable style={[styles.cardTiles, {backgroundColor: cardColor(item)}]} onPress={() => {handleSelectCard(item)}}>
             { item.logo == "" ? 
-              <View>
+              <View style={styles.noCardView}>
                 <IconSymbol size={60} name={'card.fill'} color={'white'} style={styles.noCardLogo}/>
                 <Text style={styles.noCardName}>{item.store}</Text> 
               </View>
@@ -133,13 +133,19 @@ const styles = StyleSheet.create({
     marginRight: "auto",
     position: "static"
   },
+  noCardView: {
+    height: '100%'
+  },
   noCardLogo: {
     alignSelf: "center",
-    marginVertical: "auto",
+    verticalAlign: "middle",
+    marginTop: 8
   },
   noCardName: {
+    width: '70%',
     color: 'white',
     fontSize: 14,
-    textAlign: "center"
+    textAlign: "center",
+    alignSelf: "center",
   }
 });
