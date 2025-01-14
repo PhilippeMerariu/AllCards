@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, FlatList, View, Image, TouchableHighlight } from 'react-native';
+import { StyleSheet, Pressable, FlatList, View, Image, TouchableHighlight, Text } from 'react-native';
 import { displayMessage } from '@/utilities/displayMessage';
 import * as storage from '@/utilities/storage';
 import * as constants from '@/utilities/constants';
@@ -86,11 +86,18 @@ export default function CardsScreen() {
         data={cards} 
         renderItem={({item}) =>
           <Pressable style={[styles.cardTiles, {backgroundColor: cardColor(item)}]} onPress={() => {handleSelectCard(item)}}>
-            <Image 
-              // source={{uri:getCardImage(item)}}
-              source={images.get(item.store)}
-              style={styles.cardLogo}
-            />
+            { item.logo == "" ? 
+              <View>
+                <IconSymbol size={60} name={'card.fill'} color={'white'} style={styles.noCardLogo}/>
+                <Text style={styles.noCardName}>{item.store}</Text> 
+              </View>
+              :
+              <Image 
+                source={{uri: item.logo}}
+                // source={images.get(item.store)}
+                style={styles.cardLogo}
+              />
+            }
           </Pressable>
         }
         numColumns={2}/>
@@ -125,5 +132,14 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: "auto",
     position: "static"
+  },
+  noCardLogo: {
+    alignSelf: "center",
+    marginVertical: "auto",
+  },
+  noCardName: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: "center"
   }
 });
