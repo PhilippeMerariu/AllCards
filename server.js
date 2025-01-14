@@ -162,9 +162,26 @@ async function deleteCard(card, user){
         await coll.updateOne(query, {$set: {"cards": cardsRes.cards}});
         return true;
     }catch(err){
-        console.log(`[deleteCard] ERROR ${err}`);
+        console.log(`[deleteCard] ERROR: ${err}`);
     }
     return false;
+}
+
+async function getCardTemplates(){
+    try{
+        const db = await connectToDB();
+        const coll = db.collection('card_templates');
+        
+        const templates = await coll.find({}).toArray();
+        if (templates == null){
+            throw new Error("No Card Templates");
+        }
+
+        return {templates: templates};
+    }catch(err){
+        console.log(`[getCardTemplates] ERROR: ${err}`);
+    }
+    return {templates: null};
 }
 //################################################
 
@@ -277,6 +294,15 @@ app.delete('/card', (req, res) => {
         return res.status(400).send({error: "An error occured while deleting the card"});
     });
 });
+
+app.get('/cardTemplates', (req, res) => {
+    getCardTemplates().then(card_templates => {
+        if (card_templates == null){
+            return res.status(400).send({error: "An error occured while retrieving card list"});
+        }
+        return res.status(200).send({card_templates: card_templates});
+    });
+})
 //################################################
 
 const PORT = process.env.PORT || 5000;

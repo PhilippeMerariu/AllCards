@@ -29,8 +29,10 @@ export default function CardFormScreen({}) {
       setColor(route.params?.card.color);
       setLogo(route.params?.card.logo);
       setPageTitle("Edit Card");
-    }else if (route.params?.cardName){
-      setStore(route.params?.cardName);
+    }else if (route.params?.cardTemplate){
+      setStore(route.params?.cardTemplate.cardName);
+      setColor(route.params?.cardTemplate.color);
+      setLogo(route.params?.cardTemplate.image);
       setPageTitle("New Card");
     }
   }, []);

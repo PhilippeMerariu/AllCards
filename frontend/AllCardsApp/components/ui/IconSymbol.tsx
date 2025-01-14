@@ -10,7 +10,9 @@ const MAPPING = {
   'save.fill': 'save',
   'delete.fill': 'delete',
   'settings.fill': 'settings',
-  'cards.fill': 'style'
+  'cards.fill': 'style',
+  'card.fill': 'credit-card',
+  'search.fill': 'search'
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],
