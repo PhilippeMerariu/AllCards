@@ -47,7 +47,6 @@ async function getUserByEmail(email){
     return {user: user.toJSON()};
 }
 
-
 async function createUser(email, password){
     try{
         const db = await connectToDB();

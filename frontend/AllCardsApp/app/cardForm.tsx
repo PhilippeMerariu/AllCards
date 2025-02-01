@@ -119,7 +119,7 @@ export default function CardFormScreen({}) {
   const generateBarcode = async () => {
     let img;
     try {
-      img = await bwipjs.toDataURL({bcid: "ean13", text: barcode, includetext: true});
+      img = await bwipjs.toDataURL({bcid: "code128", text: barcode, includetext: true});
       setBarcodeObject(img);
     } catch (e) {
       console.log(e);

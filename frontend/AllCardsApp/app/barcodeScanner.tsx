@@ -18,7 +18,7 @@ export default function BarcodeScannerScreen({}) {
     )
     const { hasPermission, requestPermission } = useCameraPermission()
     const codeScanner = useCodeScanner({
-        codeTypes: ['ean-13'],
+        codeTypes: ['code-128'],
         onCodeScanned: (codes) => {
             for (const code of codes){
                 // console.log(`Scanned ${code.type} code => ${code.value}`);
